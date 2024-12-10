@@ -1,0 +1,68 @@
+.registration-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--bg-dark);
+  }
+  
+  .registration-card {
+    background: var(--bg-darker);
+    padding: 32px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid var(--border-color);
+  }
+  
+  .registration-card h2 {
+    color: var(--text-light);
+    font-size: 24px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  
+  .registration-card .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .registration-card input {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-light);
+    font-size: 16px;
+  }
+  
+  .register-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary-color);
+    color: var(--text-light);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  
+  .register-btn:hover {
+    opacity: 0.9;
+  }
+
+  .switch-auth {
+    margin-top: 16px;
+    text-align: center;
+    color: var(--text-dim);
+  }
+  
+  .switch-auth a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  .switch-auth a:hover {
+    text-decoration: underline;
+  }

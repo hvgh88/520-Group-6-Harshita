@@ -1,0 +1,14 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+}
+
+.main-content {
+  margin-top: 60px;
+  padding: 20px;
+  flex: 1;
+  background-color: var(--bg-dark);
+  min-height: calc(100vh - 60px);
+}

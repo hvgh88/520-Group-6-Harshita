@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat App Test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h1>Chat App Test</h1>
+<div>
+  <label for="userId">User ID:</label>
+  <input type="number" id="userId" value="1">
+  <label for="groupId">Group ID:</label>
+  <input type="number" id="groupId" value="1">
+  <button onclick="connect()">Connect</button>
+</div>
+<div id="chatBox" style="display:none;">
+  <h2>Chat</h2>
+  <div id="messages"></div>
+  <input type="text" id="messageInput" placeholder="Enter message">
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+  let stompClient = null;
+  let currentUser = null;
+
+  async function connect() {
+      const userId = document.getElementById('userId').value;
+      const groupId = document.getElementById('groupId').value;
+      console.log('Connecting with userId:', userId, 'groupId:', groupId);
+
+      try {
+          // Fetch user details
+          const response = await fetch(`http://localhost:8080/user/${userId}`);
+          if (!response.ok) {
+              throw new Error('Failed to fetch user details');
+          }
+          currentUser = await response.json();
+          console.log('Current user:', currentUser);
+
+          const socket = new SockJS('http://localhost:8080/ws');
+          stompClient = Stomp.over(socket);
+
+          stompClient.connect({}, function(frame) {
+              console.log('Connected: ' + frame);
+              document.getElementById('chatBox').style.display = 'block';
+
+              console.log('Fetching messages for group:', groupId);
+              fetchMessagesFromElasticsearch(groupId);
+
+              stompClient.subscribe('/topic/messages/' + groupId, function(message) {
+                  console.log('Received new message:', message.body);
+                  const messageBody = JSON.parse(message.body);
+                  displayMessage(messageBody);
+              });
+          });
+      } catch (error) {
+          console.error('Error during connection:', error);
+      }
+  }
+
+  async function fetchMessagesFromElasticsearch(groupId) {
+      try {
+          const response = await fetch('http://localhost:9200/messages/_search', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Origin': 'http://localhost:8000'
+              },
+              body: JSON.stringify({
+                  query: {
+                      match: {
+                          "group.id": groupId
+                      }
+                  }
+              })
+          });
+          const data = await response.json();
+          console.log('Received messages:', data);
+          data.hits.hits.forEach(hit => displayMessage(hit._source));
+      } catch (error) {
+          console.error('Error fetching messages from Elasticsearch:', error);
+      }
+  }
+
+  function displayMessage(message) {
+    console.log('Displaying message:', message);
+    const messagesDiv = document.getElementById('messages');
+    const username = message.sender ? message.sender.username : message.senderUsername;
+    messagesDiv.innerHTML += `<p><strong>${username}:</strong> ${message.content}</p>`;
+}
+
+  function sendMessage() {
+      if (!currentUser) {
+          console.error('User not connected');
+          return;
+      }
+      const content = document.getElementById('messageInput').value;
+      const groupId = document.getElementById('groupId').value;
+      stompClient.send("/app/chat/" + groupId, {}, JSON.stringify({
+          'content': content,
+          'senderId': currentUser.id,
+          'groupId': parseInt(groupId),
+          'senderUsername': currentUser.username
+      }));
+      document.getElementById('messageInput').value = '';
+  }
+</script>
+</body>
+</html>
