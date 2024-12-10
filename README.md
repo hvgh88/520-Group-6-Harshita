@@ -47,3 +47,5 @@ b. `docker run -p 9200:9200 -e "discovery.type=single-node" \
 9. Search for Groups in the chats page
 10. Search for messages in a particular group within the chat window
 11. Logout
+
+# Demo Video Link: https://drive.google.com/file/d/1eaMuDZctpdAwvtFOH9t-GZPvSb25D6qk/view?usp=sharing
