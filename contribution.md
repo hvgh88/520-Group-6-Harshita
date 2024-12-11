@@ -1,4 +1,4 @@
-# Contents of the repository
+# Functionalities
 - Create User based on username
 - Login using UID
 - View ALl Gropus
